@@ -1,20 +1,26 @@
-import smbus
-import time
+mport time
+import board
+import busio
+import adafruit_bh1750
 
-# Define the I2C address of the BH1750 sensor
-BH1750_ADDR = 0x23
+# Create I2C bus
+i2c = busio.I2C(board.SCL, board.SDA)
 
-# Create an I2C bus object
-bus = smbus.SMBus(1)
+# Create sensor object
+sensor = adafruit_bh1750.BH1750(i2c)
 
-# Read the light intensity from the sensor
-light_intensity = bus.read_i2c_block_data(BH1750_ADDR, 0x00, 2)
+# Main loop
+try:
+    while True:
+        # Read the light level
+        light_level = sensor.lux
 
-# Convert the light intensity from a 16-bit value to a lux value
-lux = light_intensity[0] << 8 | light_intensity[1]
+        # Print the light level
+        print("Light: {} lux".format(light_level))
 
-# Print the light intensity to the console
-print("Light intensity:", lux, "lux")
+        # Wait for a moment
+        time.sleep(1)
 
-# Wait for 1 second before reading the light intensity again
-time.sleep(1)
+# Exit cleanly
+except KeyboardInterrupt:
+    pass
